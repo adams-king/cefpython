@@ -51,7 +51,7 @@ g_htmlcode2 = '''
 
 def main():
     cef.Initialize()
-    browser = cef.CreateBrowserSync(url=cef.GetDataUrl(g_htmlcode2),
+    browser = cef.CreateBrowserSync(url=cef.GetDataUrl(g_htmlcode),
                                     window_title="Javascript Bindings")
     browser.SetClientHandler(LoadHandler())
     bindings = cef.JavascriptBindings()
