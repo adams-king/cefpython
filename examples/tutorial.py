@@ -56,6 +56,19 @@ HTML_code = """
 </html>
 """
 
+HTML_CODE2 = '''
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- zakernews-728 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-6201639787321531"
+     data-ad-slot="2440155965"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+'''
+
+
 
 def main():
     check_versions()
@@ -66,11 +79,12 @@ def main():
     settings = {
         # "product_version": "MyProduct/10.00",
         # "user_agent": "MyAgent/20.00 MyProduct/10.00",
+        "user_agent" : "Mozilla/5.0 (Windows; U; Windows NT 6.0; en-US) AppleWebKit/527  (KHTML, like Gecko, Safari/419.3) Arora/0.6 (Change: )"
     }
     cef.Initialize(settings=settings)
     set_global_handler()
     browser = cef.CreateBrowserSync(url=html_to_data_uri(HTML_code),
-                                    window_title="Tutorial")
+                                    window_title="Google")
     set_client_handlers(browser)
     set_javascript_bindings(browser)
     cef.MessageLoop()

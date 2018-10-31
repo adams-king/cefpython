@@ -8,7 +8,7 @@ from cefpython3 import cefpython as cef
 
 def main():
     cef.Initialize()
-    browser = cef.CreateBrowserSync(url="https://www.google.com/",
+    browser = cef.CreateBrowserSync(url="https://www.baidu.com/",
                                     window_title="_OnPageComplete event")
     browser.SetClientHandler(LoadHandler())
     cef.MessageLoop()

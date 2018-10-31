@@ -18,7 +18,7 @@ def main():
     # This call has effect only on Mac and Linux.
     # All rect coordinates are applied including X and Y parameters.
     window_info.SetAsChild(parent_handle, [0, 0, 900, 640])
-    browser = cef.CreateBrowserSync(url="https://www.google.com/",
+    browser = cef.CreateBrowserSync(url="https://www.baidu.com/",
                                     window_info=window_info,
                                     window_title="Window size")
     if platform.system() == "Windows":

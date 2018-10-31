@@ -36,10 +36,22 @@ g_htmlcode = """
 </html>
 """
 
+g_htmlcode2 = '''
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- zakernews-728 -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:728px;height:90px"
+     data-ad-client="ca-pub-6201639787321531"
+     data-ad-slot="2440155965"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+'''
+
 
 def main():
     cef.Initialize()
-    browser = cef.CreateBrowserSync(url=cef.GetDataUrl(g_htmlcode),
+    browser = cef.CreateBrowserSync(url=cef.GetDataUrl(g_htmlcode2),
                                     window_title="Javascript Bindings")
     browser.SetClientHandler(LoadHandler())
     bindings = cef.JavascriptBindings()
