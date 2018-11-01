@@ -50,6 +50,11 @@ def main():
     if WINDOWS:
         # noinspection PyUnresolvedReferences, PyArgumentList
         cef.DpiAware.EnableHighDpiSupport()
+
+    #change UserAgent
+    # settings['user_agent'] = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5"
+    # settings['user_agent'] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.36 Safari/535.7"
+
     cef.Initialize(settings=settings)
     app = CefApp(False)
     app.MainLoop()
