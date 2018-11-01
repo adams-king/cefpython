@@ -175,7 +175,7 @@ class MainFrame(wx.Frame):
         window_info.SetAsChild(self.browser_panel.GetHandle(),
                                [0, 0, width, height])
         self.browser = cef.CreateBrowserSync(window_info,
-                                             url="https://www.google.com/")
+                                             url="https://www.baidu.com/")
         self.browser.SetClientHandler(FocusHandler())
 
     def OnSetFocus(self, _):
