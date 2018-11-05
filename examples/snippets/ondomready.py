@@ -29,6 +29,17 @@ class LoadHandler(object):
     def __getitem__(self, key):
         return getattr(self, key)
 
+    # def OnLoadingStateChange(self, browser, is_loading = False, can_go_back = False, can_go_forward = False):
+    #     browser.ExecuteJavascript("""
+    #         if (document.readyState === "complete") {
+    #             LoadHandler_OnDomReady();
+    #         } else {
+    #             document.addEventListener("DOMContentLoaded", function() {
+    #                 LoadHandler_OnDomReady();
+    #             });
+    #         }
+    #     """)
+
     def OnLoadStart(self, browser, **_):
         browser.ExecuteJavascript("""
             if (document.readyState === "complete") {
