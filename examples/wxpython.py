@@ -180,8 +180,9 @@ class MainFrame(wx.Frame):
         window_info.SetAsChild(self.browser_panel.GetHandle(),
                                [0, 0, width, height])
         self.browser = cef.CreateBrowserSync(window_info,
-                                             url="https://www.baidu.com/")
+                                             url="https://www.baidu.com/s?wd=hello%20kitty&rsv_spt=1&rsv_iqid=0xb548f8e100010f06&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=13&rsv_sug1=12&rsv_sug7=100&rsv_sug2=0&inputT=4106&rsv_sug4=4106")
         self.browser.SetClientHandler(FocusHandler())
+        self.browser.SetClientHandler(LoadingStateChange())
 
     def OnSetFocus(self, _):
         if not self.browser:
@@ -243,6 +244,19 @@ class FocusHandler(object):
             print("[wxpython.py] FocusHandler.OnGotFocus:"
                   " keyboard focus fix (Issue #284)")
             browser.SetFocus(True)
+
+class LoadingStateChange(object):
+    def OnLoadingStateChange(self, browser, is_loading, **_):
+        if not is_loading:
+            cef.PostDelayedTask(cef.TID_UI, 5000, reload_page, browser)
+            print("www.baidu.com had loaded completely.")
+
+
+
+
+def reload_page(browser):
+    browser.Reload()
+
 
 
 class CefApp(wx.App):
