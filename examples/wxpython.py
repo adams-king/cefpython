@@ -179,10 +179,19 @@ class MainFrame(wx.Frame):
         assert self.browser_panel.GetHandle(), "Window handle not available"
         window_info.SetAsChild(self.browser_panel.GetHandle(),
                                [0, 0, width, height])
-        self.browser = cef.CreateBrowserSync(window_info,
-                                             url="https://www.baidu.com/s?wd=hello%20kitty&rsv_spt=1&rsv_iqid=0xb548f8e100010f06&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=13&rsv_sug1=12&rsv_sug7=100&rsv_sug2=0&inputT=4106&rsv_sug4=4106")
+        # self.browser = cef.CreateBrowserSync(window_info, url="https://www.baidu.com/s?wd=hello%20kitty&rsv_spt=1&rsv_iqid=0xb548f8e100010f06&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=13&rsv_sug1=12&rsv_sug7=100&rsv_sug2=0&inputT=4106&rsv_sug4=4106")
+        self.browser = cef.CreateBrowserSync(window_info, url="about:blank")
+        google_script_str = ""
+        google_script_str += "<html><head><title>Test</title></head><body bgcolor='white'>"
+        google_script_str += "<script>alert(document.referrer)</script>"
+        google_script_str += "<script async src='http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'></script>"
+        google_script_str += "<ins class='adsbygoogle'style='display:inline-block;width:728px;height:90px'data-ad-client='ca-pub-6201639787321531'data-ad-slot='2440155965'></ins>"
+        google_script_str += "<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>"
+        google_script_str += "</body></html>"
+        self.browser.GetFocusedFrame().LoadString(google_script_str, "http://www.baidu.com")
         self.browser.SetClientHandler(FocusHandler())
         self.browser.SetClientHandler(LoadingStateChange())
+        self.browser.SetClientHandler(RequestHandler())
 
     def OnSetFocus(self, _):
         if not self.browser:
@@ -248,14 +257,29 @@ class FocusHandler(object):
 class LoadingStateChange(object):
     def OnLoadingStateChange(self, browser, is_loading, **_):
         if not is_loading:
-            cef.PostDelayedTask(cef.TID_UI, 5000, reload_page, browser)
+            cef.PostDelayedTask(cef.TID_UI, 15000, reload_page, browser)
             print("www.baidu.com had loaded completely.")
 
+
+class RequestHandler(object):
+    def OnBeforeBrowse(self, browser, frame, request, user_gesture = True, **_):
+        # request_ = request.CreateRequest()
+        # request_.SetHeaderMap({'Referer':'http://www.zaker.com', 'X-Forwarded-For':'33.93.233.36', 'X-Client-IP':'33.93.233.36'})
+        request.SetHeaderMap({'Referer':'http://www.zaker.com', 'X-Forwarded-For':'33.93.233.36', 'X-Client-IP':'33.93.233.36'})
 
 
 
 def reload_page(browser):
-    browser.Reload()
+    google_script_str = ""
+    google_script_str += "<html><head><title>Test</title></head><body bgcolor='white'>"
+    google_script_str += "<script>alert(document.referrer)</script>"
+    google_script_str += "<script async src='http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'></script>"
+    google_script_str += "<ins class='adsbygoogle'style='display:inline-block;width:728px;height:90px'data-ad-client='ca-pub-6201639787321531'data-ad-slot='2440155965'></ins>"
+    google_script_str += "<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>"
+    google_script_str += "</body></html>"
+    browser.GetFocusedFrame().LoadString(google_script_str, "http://www.baidu.com")
+
+    # browser.Reload()
 
 
 
