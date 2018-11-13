@@ -199,6 +199,8 @@ class MainFrame(wx.Frame):
         self.browser.SetClientHandler(FocusHandler())
         # self.browser.SetClientHandler(LoadHandler())
 
+        self.browser.SetClientHandler(V8ContextHandler())
+
 
         # cef.Request
 
@@ -282,6 +284,11 @@ class RequestHandler(object):
         # return True
 
 
+class V8ContextHandler(object):
+
+    def OnContextCreated(self, browser, frame):
+        cef.PostTask(cef.TID_RENDERER, change_screen_solution, browser)
+
 
 
 def reload_page(browser):
@@ -295,6 +302,18 @@ def reload_page(browser):
     browser.GetFocusedFrame().LoadString(google_script_str, "http://www.baidu.com")
 
     # browser.Reload()
+
+def change_screen_solution(browser):
+    browser.ExecuteJavascript("""Object.defineProperty(window.screen, 'height', {"
+     "    get: function() {"
+      "        return 600;"
+      "    }"
+      "});"
+     "Object.defineProperty(window.screen, 'width', {"
+     "    get: function() {"
+     "        return 800;"
+     "    }"
+     "});""")
 
 # def set_header_map(request):
 #     print(request)
