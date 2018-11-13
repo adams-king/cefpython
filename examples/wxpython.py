@@ -183,20 +183,21 @@ class MainFrame(wx.Frame):
         # cef.SetGlobalClientHandler(RequestHandler())
 
         # self.browser = cef.CreateBrowserSync(window_info, url="https://www.baidu.com/s?wd=hello%20kitty&rsv_spt=1&rsv_iqid=0xb548f8e100010f06&issp=1&f=8&rsv_bp=0&rsv_idx=2&ie=utf-8&tn=baiduhome_pg&rsv_enter=1&rsv_sug3=13&rsv_sug1=12&rsv_sug7=100&rsv_sug2=0&inputT=4106&rsv_sug4=4106")
-        self.browser = cef.CreateBrowserSync(window_info, url="about:blank")
+        self.browser = cef.CreateBrowserSync(window_info, url="http://cn.screenresolution.org/")
+        # self.browser = cef.CreateBrowserSync(window_info, url="about:blank")
 
         self.browser.SetClientHandler(RequestHandler())
 
-        google_script_str = ""
-        google_script_str += "<html><head><title>Test</title></head><body bgcolor='white'>"
-        google_script_str += "<script>alert(document.referrer)</script>"
-        google_script_str += "<script async src='http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'></script>"
-        google_script_str += "<ins class='adsbygoogle'style='display:inline-block;width:728px;height:90px'data-ad-client='ca-pub-6201639787321531'data-ad-slot='2440155965'></ins>"
-        google_script_str += "<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>"
-        google_script_str += "</body></html>"
-        self.browser.GetFocusedFrame().LoadString(google_script_str, "http://www.baidu.com")
+        # google_script_str = ""
+        # google_script_str += "<html><head><title>Test</title></head><body bgcolor='white'>"
+        # google_script_str += "<script>alert(document.referrer)</script>"
+        # google_script_str += "<script async src='http://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js'></script>"
+        # google_script_str += "<ins class='adsbygoogle'style='display:inline-block;width:728px;height:90px'data-ad-client='ca-pub-6201639787321531'data-ad-slot='2440155965'></ins>"
+        # google_script_str += "<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>"
+        # google_script_str += "</body></html>"
+        # self.browser.GetFocusedFrame().LoadString(google_script_str, "http://www.baidu.com")
         self.browser.SetClientHandler(FocusHandler())
-        self.browser.SetClientHandler(LoadingStateChange())
+        # self.browser.SetClientHandler(LoadHandler())
 
 
         # cef.Request
@@ -262,7 +263,7 @@ class FocusHandler(object):
                   " keyboard focus fix (Issue #284)")
             browser.SetFocus(True)
 
-class LoadingStateChange(object):
+class LoadHandler(object):
     def OnLoadingStateChange(self, browser, is_loading, **_):
         if not is_loading:
             cef.PostDelayedTask(cef.TID_UI, 15000, reload_page, browser)
@@ -271,18 +272,14 @@ class LoadingStateChange(object):
 
 class RequestHandler(object):
 
-    def OnBeforeBrowse(self, browser, frame, request, **_):
+    def OnBeforeResourceLoad(self, frame, request, **_):
         # request_ = request.CreateRequest()
         # request_.SetHeaderMap({'Referer':'http://www.zaker.com', 'X-Forwarded-For':'33.93.233.36', 'X-Client-IP':'33.93.233.36'})
-
-        cef.PostTask(cef.TID_UI, set_header_map, browser, frame, request)
-
-    def OnBeforeResourceLoad(self, browser, frame, request):
-        # request_ = request.CreateRequest()
-        # request_.SetHeaderMap({'Referer':'http://www.zaker.com', 'X-Forwarded-For':'33.93.233.36', 'X-Client-IP':'33.93.233.36'})
-
-        cef.PostTask(cef.TID_UI, set_header_map, browser, frame, request)
-
+        # if frame.IsMain():
+            # cef.PostTask(cef.TID_UI, set_header_map, request)
+        request.SetHeaderMultimap([('Referer', 'http://www.zaker.com'), ('X-Forwarded-For', '33.93.233.36'),
+                                       ('X-Client-IP', '33.93.233.36')])
+        # return True
 
 
 
@@ -299,14 +296,14 @@ def reload_page(browser):
 
     # browser.Reload()
 
-def set_header_map(browser, frame, request):
-    print(request)
-    print("SetHeaderMap begin!")
-
-    # request.SetHeaderMap({'Referer': 'http://www.zaker.com', 'X-Forwarded-For': '33.93.233.36', 'X-Client-IP': '33.93.233.36'})
-    request.SetHeaderMultimap([('Referer', 'http://www.zaker.com'), ('X-Forwarded-For', '33.93.233.36'), ('X-Client-IP', '33.93.233.36')])
-    print(request)
-    print("SetHeaderMap end!")
+# def set_header_map(request):
+#     print(request)
+#     print("SetHeaderMap begin!")
+#
+#     # request.SetHeaderMap({'Referer': 'http://www.zaker.com', 'X-Forwarded-For': '33.93.233.36', 'X-Client-IP': '33.93.233.36'})
+#     request.SetHeaderMultimap([('Referer', 'http://www.zaker.com'), ('X-Forwarded-For', '33.93.233.36'), ('X-Client-IP', '33.93.233.36')])
+#     print(request)
+#     print("SetHeaderMap end!")
 
 
 class CefApp(wx.App):
