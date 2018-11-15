@@ -12,6 +12,7 @@ from cefpython3 import cefpython as cef
 import platform
 import sys
 import os
+import win32api
 
 # Platforms
 WINDOWS = (platform.system() == "Windows")
@@ -55,7 +56,13 @@ def main():
     # settings['user_agent'] = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5"
     # settings['user_agent'] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.36 Safari/535.7"
 
-    cef.Initialize(settings=settings)
+    switches = {
+        "enable-media-stream": "",
+        "proxy-server": "socks5://127.0.0.1:8888",
+        "disable-gpu": "",
+    }
+
+    cef.Initialize(settings=settings, switches=switches)
     app = CefApp(False)
     app.MainLoop()
     del app  # Must destroy before calling Shutdown
@@ -79,6 +86,7 @@ def scale_window_size_for_high_dpi(width, height):
     If scaled value is bigger than the work area on the display
     then it will be reduced."""
     if not WINDOWS:
+        print("NOT WINDOWS")
         return width, height
     (_, _, max_width, max_height) = wx.GetClientDisplayRect().Get()
     # noinspection PyUnresolvedReferences
@@ -105,9 +113,22 @@ class MainFrame(wx.Frame):
         g_count_windows += 1
 
         if WINDOWS:
+
+            dm = win32api.EnumDisplaySettings(None, 0)
+            dm.PelsHeight = 700
+            dm.PelsWidth = 1280
+            dm.BitsPerPel = 32
+            dm.DisplayFixedOutput = 0
+            win32api.ChangeDisplaySettings(dm, 0)
+
+
+
+
             # noinspection PyUnresolvedReferences, PyArgumentList
+            cef.DpiAware.EnableHighDpiSupport()
             print("[wxpython.py] System DPI settings: %s"
                   % str(cef.DpiAware.GetSystemDpi()))
+            # print(cef.DpiAware.Scale((1300, 1200)))
         if hasattr(wx, "GetDisplayPPI"):
             print("[wxpython.py] wx.GetDisplayPPI = %s" % wx.GetDisplayPPI())
         print("[wxpython.py] wx.GetDisplaySize = %s" % wx.GetDisplaySize())
@@ -199,7 +220,8 @@ class MainFrame(wx.Frame):
         self.browser.SetClientHandler(FocusHandler())
         # self.browser.SetClientHandler(LoadHandler())
 
-        self.browser.SetClientHandler(V8ContextHandler())
+        self.browser.clientCallbacks["OnContextCreated"] = V8ContextHandler2.OnContextCreated
+        # self.browser.SetClientHandler(V8ContextHandler())
 
 
         # cef.Request
@@ -284,10 +306,21 @@ class RequestHandler(object):
         # return True
 
 
-class V8ContextHandler(object):
+class V8ContextHandler2(object):
 
-    def OnContextCreated(self, browser, frame):
-        cef.PostTask(cef.TID_RENDERER, change_screen_solution, browser)
+    def OnContextCreated(browser, frame):
+        browser.ExecuteJavascript("""Object.defineProperty(window.screen, 'height', {"
+             "    get: function() {"
+              "        return 600;"
+              "    }"
+              "});"
+             "Object.defineProperty(window.screen, 'width', {"
+             "    get: function() {"
+             "        return 800;"
+             "    }"
+             "});""")
+
+        # cef.PostTask(cef.TID_RENDERER, change_screen_solution, browser)
 
 
 
