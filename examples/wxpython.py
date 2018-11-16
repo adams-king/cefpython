@@ -56,13 +56,22 @@ def main():
     # settings['user_agent'] = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5"
     # settings['user_agent'] = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.36 Safari/535.7"
 
+    # switches = {
+    #     "enable-media-stream": "",
+    #     "proxy-server": "socks5://127.0.0.1:8888",
+    #     "disable-gpu": "",
+    #     "disable-image-loading",
+    # }
+
     switches = {
         "enable-media-stream": "",
-        "proxy-server": "socks5://127.0.0.1:8888",
+        "proxy-server": "",
         "disable-gpu": "",
+        "disable-image-loading": "",
     }
 
     cef.Initialize(settings=settings, switches=switches)
+    # cef.Initialize(settings=settings)
     app = CefApp(False)
     app.MainLoop()
     del app  # Must destroy before calling Shutdown
@@ -115,8 +124,8 @@ class MainFrame(wx.Frame):
         if WINDOWS:
 
             dm = win32api.EnumDisplaySettings(None, 0)
-            dm.PelsHeight = 700
-            dm.PelsWidth = 1280
+            dm.PelsHeight = 768
+            dm.PelsWidth = 1366
             dm.BitsPerPel = 32
             dm.DisplayFixedOutput = 0
             win32api.ChangeDisplaySettings(dm, 0)
@@ -218,9 +227,17 @@ class MainFrame(wx.Frame):
         # google_script_str += "</body></html>"
         # self.browser.GetFocusedFrame().LoadString(google_script_str, "http://www.baidu.com")
         self.browser.SetClientHandler(FocusHandler())
-        # self.browser.SetClientHandler(LoadHandler())
+        self.browser.SetClientHandler(LoadHandler())
 
-        self.browser.clientCallbacks["OnContextCreated"] = V8ContextHandler2.OnContextCreated
+        # print(self.browser.GetZoomLevel())
+        #         # # self.browser.SetZoomLevel(self.browser.GetZoomLevel() - 99.0)
+        #         # self.browser.SetZoomLevel(125%)
+        #         # # cef.PyBrowser.SetZoomLevel()
+        #         # print(self.browser.GetZoomLevel())
+
+        # self.browser.SetClientHandler(LifespanHandler())
+
+        # self.browser.clientCallbacks["OnContextCreated"] = V8ContextHandler2.OnContextCreated
         # self.browser.SetClientHandler(V8ContextHandler())
 
 
@@ -288,10 +305,18 @@ class FocusHandler(object):
             browser.SetFocus(True)
 
 class LoadHandler(object):
+
+    def OnLoadStart(self, browser, frame):
+        # change the zoomlevel of browser.
+        # print(browser.GetZoomLevel())
+        browser.SetZoomLevel(browser.GetZoomLevel() - 99.0)
+        # print(browser.GetZoomLevel())
+
     def OnLoadingStateChange(self, browser, is_loading, **_):
-        if not is_loading:
-            cef.PostDelayedTask(cef.TID_UI, 15000, reload_page, browser)
-            print("www.baidu.com had loaded completely.")
+        pass
+        # if not is_loading:
+        #     cef.PostDelayedTask(cef.TID_UI, 15000, reload_page, browser)
+        #     print("www.baidu.com had loaded completely.")
 
 
 class RequestHandler(object):
@@ -305,22 +330,31 @@ class RequestHandler(object):
                                        ('X-Client-IP', '33.93.233.36')])
         # return True
 
+# class LifespanHandler(object):
+#
+#     def _OnAfterCreated(self, browser):
+#
+#         print(browser.GetZoomLevel())
+#         # browser.SetZoomLevel(self.browser.GetZoomLevel() - 99.0)
+#         browser.SetZoomLevel(99.0)
+#         print(browser.GetZoomLevel())
 
-class V8ContextHandler2(object):
 
-    def OnContextCreated(browser, frame):
-        browser.ExecuteJavascript("""Object.defineProperty(window.screen, 'height', {"
-             "    get: function() {"
-              "        return 600;"
-              "    }"
-              "});"
-             "Object.defineProperty(window.screen, 'width', {"
-             "    get: function() {"
-             "        return 800;"
-             "    }"
-             "});""")
-
-        # cef.PostTask(cef.TID_RENDERER, change_screen_solution, browser)
+# class V8ContextHandler2(object):
+#
+#     def OnContextCreated(browser, frame):
+#         browser.ExecuteJavascript("""Object.defineProperty(window.screen, 'height', {"
+#              "    get: function() {"
+#               "        return 600;"
+#               "    }"
+#               "});"
+#              "Object.defineProperty(window.screen, 'width', {"
+#              "    get: function() {"
+#              "        return 800;"
+#              "    }"
+#              "});""")
+#
+#         # cef.PostTask(cef.TID_RENDERER, change_screen_solution, browser)
 
 
 
